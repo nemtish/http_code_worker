@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Helpers;
+
 class CurlHelper {
 
 	public static function checkHttpCode(string $url) : string
