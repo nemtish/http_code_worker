@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use Exception;
 use Symfony\Component\Dotenv\Dotenv;
 
 class Repository
@@ -21,6 +22,11 @@ class Repository
 			'driver' => $_ENV['DB_DRIVER'],
 		);
 
-		$this->dbConection = \Doctrine\DBAL\DriverManager::getConnection($connectionParams);
+		try {
+			$this->dbConection = \Doctrine\DBAL\DriverManager::getConnection($connectionParams);
+		} catch(Exception $e) {
+			die('DB Connection error: '.$e->getMessage());
+		}
+
 	}
 }

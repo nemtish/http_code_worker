@@ -9,11 +9,6 @@ class JobsRepository extends Repository
 	const STATUS_DONE = 'DONE';
 
 
-	public function getAllNewJobs()
-	{
-		return $this->dbConection->fetchAll("SELECT id,url FROM jobs WHERE status=?", [static::STATUS_NEW]);
-	}
-
 	public function getFirstNewJob()
 	{
 		return $this->dbConection->fetchAssoc("SELECT id,url FROM jobs WHERE status=?", [static::STATUS_NEW]);
