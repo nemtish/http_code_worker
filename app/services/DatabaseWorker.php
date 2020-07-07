@@ -25,16 +25,7 @@ class DatabaseWorker {
 
 		if ($job) {
 			$this->lockCurrentJob($job);
-			$httpCode = $this->getJobResult($job);
-
-			echo "WORKER {$this->workerId} \n";
-			echo "current job: {$job['url']} \n";
-			echo "job http code: {$httpCode} \n";
-
-			$this->jobsRepository->updateJob($job['id'], [
-				'status'	=> JobsRepository::STATUS_DONE,
-				'http_code' => $httpCode
-			]);
+			$this->perform($job);
 		} else {
 			throw new Exception('no more jobs');
 		}
@@ -46,7 +37,6 @@ class DatabaseWorker {
 	 */
 	private function lockCurrentJob(array $job)
 	{
-		$this->currentJob = $job;
 		$this->jobsRepository->updateJob(
 			$job['id'],
 			['status' => JobsRepository::STATUS_PROCESSING ]
@@ -54,10 +44,26 @@ class DatabaseWorker {
 	}
 
 	/**
-	 * Return job result http code
+	 * Perform job and write http code in DB
 	 */
-	private function getJobResult(array $job)
+	private function perform(array $job)
 	{
-		return CurlHelper::checkHttpCode($job['url']);
+		try {
+			$httpCode = CurlHelper::checkUrlHttpCode($job['url']);
+			$status = JobsRepository::STATUS_DONE;
+		} catch (Exception $e) {
+			$status = JobsRepository::STATUS_ERROR;
+			$httpCode = $e->getCode();
+		}
+
+		echo "WORKER {$this->workerId} \n";
+		echo "current job: {$job['url']} \n";
+		echo "job status: {$status} \n";
+		echo "job http code: {$httpCode} \n";
+
+		$this->jobsRepository->updateJob($job['id'], [
+			'status'	=> $status,
+			'http_code' => $httpCode
+		]);
 	}
 }

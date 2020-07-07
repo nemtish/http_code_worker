@@ -7,6 +7,7 @@ class JobsRepository extends Repository
 	const STATUS_NEW = 'NEW';
 	const STATUS_PROCESSING = 'PROCESSING';
 	const STATUS_DONE = 'DONE';
+	const STATUS_ERROR = 'ERROR';
 
 
 	public function getFirstNewJob()
